@@ -770,6 +770,9 @@
     // Send to Google Sheets
     const res = await fetch("https://script.google.com/macros/s/AKfycbzbXPX2pxa5aOzhp_KgW8KUgf4lBUmuAyacT8bdYG5hUuhgk4z0vWkV1lWUbiVMfyZW/exec", {
       method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
       body: JSON.stringify(data)
     });
 
