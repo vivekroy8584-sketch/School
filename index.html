@@ -716,23 +716,28 @@
         </div>
       </div>
       <form class="contact-form" onsubmit="handleForm(event)">
-        <div class="form-row">
-          <input class="form-input" type="text" placeholder="Parent's Name" required />
-          <input class="form-input" type="tel" placeholder="Phone Number" required />
-        </div>
-        <input class="form-input" type="email" placeholder="Email Address" />
-        <select class="form-input form-select">
-          <option value="" disabled selected>Enquiring for Class...</option>
-          <option>Class I – II (Age 6–8)</option>
-          <option>Class III – V (Age 8–11)</option>
-          <option>Class VI – VIII (Age 11–14)</option>
-          <option>Class IX – X (Age 14–16)</option>
-          <option>Class XI - XII (Age 16-18)</option>
-          <option>General Enquiry</option>
-        </select>
-        <textarea class="form-textarea" placeholder="Your message or questions..."></textarea>
-        <button type="submit" class="form-submit">Send Message →</button>
-      </form>
+  <div class="form-row">
+    <input class="form-input" type="text" name="parent_name" placeholder="Parent's Name" required />
+    
+    <input class="form-input" type="tel" name="phone" placeholder="Phone Number" required />
+  </div>
+
+  <input class="form-input" type="email" name="email" placeholder="Email Address" />
+
+  <select class="form-input form-select" name="class">
+    <option value="" disabled selected>Enquiring for Class...</option>
+    <option>Class I – II (Age 6–8)</option>
+    <option>Class III – V (Age 8–11)</option>
+    <option>Class VI – VIII (Age 11–14)</option>
+    <option>Class IX – X (Age 14–16)</option>
+    <option>Class XI - XII (Age 16-18)</option>
+    <option>General Enquiry</option>
+  </select>
+
+  <textarea class="form-textarea" name="message" placeholder="Your message or questions..."></textarea>
+
+  <button type="submit" class="form-submit">Send Message →</button>
+</form>
     </div>
   </div>
 </section>
@@ -746,19 +751,58 @@
 </footer>
 
 <script>
-  function handleForm(e) {
-    e.preventDefault();
-    const btn = e.target.querySelector('.form-submit');
-    btn.textContent = 'Message Sent ✓';
-    btn.style.background = '#4CAF50';
+  async function handleForm(e) {
+  e.preventDefault();
+
+  const form = e.target;
+  const btn = form.querySelector('.form-submit');
+
+  // Collect form data
+  const data = {
+    parent_name: form.parent_name.value,
+    phone: form.phone.value,
+    email: form.email.value,
+    class: form.class.value,
+    message: form.message.value
+  };
+
+  try {
+    // Send to Google Sheets
+    const res = await fetch("https://script.google.com/macros/s/AKfycbzbXPX2pxa5aOzhp_KgW8KUgf4lBUmuAyacT8bdYG5hUuhgk4z0vWkV1lWUbiVMfyZW/exec", {
+      method: "POST",
+      body: JSON.stringify(data)
+    });
+
+    if (res.ok) {
+      // Success UI
+      btn.textContent = 'Message Sent ✓';
+      btn.style.background = '#4CAF50';
+      btn.style.color = '#fff';
+
+      setTimeout(() => {
+        btn.textContent = 'Send Message →';
+        btn.style.background = '';
+        btn.style.color = '';
+        form.reset();
+      }, 3000);
+
+    } else {
+      throw new Error("Failed");
+    }
+
+  } catch (err) {
+    // Error UI
+    btn.textContent = 'Error!';
+    btn.style.background = 'red';
     btn.style.color = '#fff';
+
     setTimeout(() => {
       btn.textContent = 'Send Message →';
       btn.style.background = '';
       btn.style.color = '';
-      e.target.reset();
     }, 3000);
   }
+}
 
   // Scroll reveal
   const observer = new IntersectionObserver((entries) => {
